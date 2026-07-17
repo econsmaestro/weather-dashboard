@@ -106,7 +106,8 @@ async function loadWeather() {
  longitude: currentLng,
  current: 'temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code',
  temperature_unit: currentUnit,
- wind_speed_unit: currentUnit === 'fahrenheit' ? 'mph' : 'kmh'
+ wind_speed_unit: currentUnit === 'fahrenheit' ? 'mph' : 'kmh',
+ timezone: 'auto'
  });
 
  console.log(`Fetching weather for lat:${currentLat},lng:${currentLng}`); // Debug log
@@ -136,6 +137,12 @@ async function loadWeather() {
  document.getElementById('feelsLike').textContent = Math.round(data.current.apparent_temperature);
  document.getElementById('feelsLikeUnit').textContent = unitLabel;
 
+ if (data.current.time) {
+ const localTime = new Date(data.current.time);
+ const timeLabel = localTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+ document.getElementById('lastUpdated').textContent = `As of ${timeLabel} local time`;
+ }
+
  } else { throw new Error('Invalid API response structure');}
 
  } catch (error) {
@@ -152,7 +159,8 @@ async function loadForecast() {
  longitude: currentLng,
  daily: 'weather_code,temperature_2m_max,temperature_2m_min',
  forecast_days: '7',
- temperature_unit: currentUnit
+ temperature_unit: currentUnit,
+ timezone: 'auto'
  });
  console.log(`Fetching forecast for lat:${currentLat},lng:${currentLng}`);
 
@@ -179,7 +187,11 @@ async function loadForecast() {
  if (!data.daily.time[i]) continue;
 
  try {
- const dateObj = new Date(data.daily.time[i]);
+ // Parse Y/M/D directly instead of new Date(dateString), which treats
+ // date-only ISO strings as UTC midnight and can roll the weekday back
+ // a day in timezones behind UTC.
+ const [year, month, day] = data.daily.time[i].split('-').map(Number);
+ const dateObj = new Date(year, month - 1, day);
  const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
 
  // Safely get max/min temps (already in the selected unit via temperature_unit param)
