@@ -8,7 +8,7 @@ body {
  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
  min-height: 100vh;
- display: flex; 
+ display: flex; flex-direction: column;
  align-items: center; justify-content: center; padding: 20px;}
 
 /* Weather Card */
@@ -49,8 +49,8 @@ body {
 .high-low { font-weight:bold;color:#333;font-size:1rem; }
 
 /* Details Grid */
-.details-grid { 
- display:grid;grid-template-columns:repeat(3,1fr);gap:15px;padding-top:25px;border-top:1px solid #eee;margin-bottom:-60px;}
+.details-grid {
+ display:grid;grid-template-columns:repeat(3,1fr);gap:15px;padding-top:25px;border-top:1px solid #eee;}
 
 .detail-item { text-align:center;}
 .detail-label { font-size:0.8rem;color:#999;margin-bottom:5px; }
@@ -86,8 +86,8 @@ body {
 /* Responsive Design */
 @media (max-width:768px) { 
  .forecast-grid { grid-template-columns:repeat(4,1fr); }
- body { padding:10px;flex-direction:column-reverse;}
- .weather-card,.forecast-section{ max-width:none;margin-bottom:25px;width:auto;}
+ body { padding:10px;}
+ .weather-card,.forecast-section{ max-width:none;margin-bottom:25px;width:auto;margin-top:0;}
 }
 
 /* Loading State */
