@@ -35,7 +35,7 @@ A static, dependency-free weather dashboard: current conditions + 7-day forecast
 - Target: GitHub Pages, repo `econsmaestro/weather-dashboard`
 - Settings → Pages → Source: `main` branch, root
 - Expected live URL: `https://econsmaestro.github.io/weather-dashboard/`
-- Status as of last update: repo zip handed off locally, user working through `git init` → push on Windows CMD.
+- Status: deployed and live. `script.js`/`index.html` bugs listed under "Known-fixed bugs" below have actually been fixed and verified via a Playwright-driven smoke test (weather load, forecast load, search toggle animation, city search re-fetch).
 
 ## Possible next steps / ideas not yet built
 - Loading spinners/skeleton states instead of "Loading..." text
