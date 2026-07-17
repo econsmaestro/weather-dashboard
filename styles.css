@@ -1,0 +1,94 @@
+/* Global Reset */
+* { 
+ margin: 0; padding: 0; box-sizing: border-box; 
+}
+
+/* Body Styling */
+body { 
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ min-height: 100vh;
+ display: flex; 
+ align-items: center; justify-content: center; padding: 20px;}
+
+/* Weather Card */
+.weather-card { background:white;border-radius:20px;box-shadow:0 25px 50px rgba(0,0,0,0.1);padding:40px;width:380px;margin-bottom:25px;}
+
+/* Forecast Section */
+.forecast-section { 
+ background:white;border-radius:20px;box-shadow:0 25px 50px rgba(0,0,0,0.1);
+ padding:30px;margin-top:-65px;position:relative;z-index:1;width:480px;}
+
+/* Card Header */
+.card-header { display:flex;justify-content:center;align-items:center;margin-bottom:25px;}
+
+/* Search Container */
+.search-container { 
+ background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:20px;display:none;}
+
+.location-input { font-size:1.4rem;color:#333;padding:6px 12px;border-radius:8px;border:none;width:auto;}
+.search-btn, .refresh-btn { 
+ background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;
+ padding:8px 15px;border-radius:8px;cursor:pointer;font-size:0.9rem;}
+
+/* Weather Icon */
+.weather-icon { font-size:4rem;margin-bottom:15px;display:block;text-align:center;}
+
+/* Temperature & Condition */
+.temperature { font-size:3.5rem;color:#333;line-height:1;text-align:center; }
+.condition { font-size:1.4rem;color:#667eea;margin-top:-20px;text-align:center; }
+
+/* Forecast Grid */
+.forecast-grid { display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:25px;}
+.forecast-card { 
+ background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);padding:15px;border-radius:12px;
+ text-align:center;display:flex;flex-direction:column;justify-content:center;height:100%;}
+
+.day-name { font-size:0.8rem;color:#667eea;margin-bottom:8px;text-transform:uppercase;}
+.forecast-icon { font-size:2rem;display:block;margin-bottom:5px;}
+.high-low { font-weight:bold;color:#333;font-size:1rem; }
+
+/* Details Grid */
+.details-grid { 
+ display:grid;grid-template-columns:repeat(3,1fr);gap:15px;padding-top:25px;border-top:1px solid #eee;margin-bottom:-60px;}
+
+.detail-item { text-align:center;}
+.detail-label { font-size:0.8rem;color:#999;margin-bottom:5px; }
+.detail-value { font-size:1.2rem;color:#333;font-weight:bold; }
+.search-btn {
+ background-color: #007bff;
+ color: white;
+ border: none;
+ padding: 8px 12px;
+ font-size: 1.5rem;
+ cursor: pointer;
+ border-radius: 6px;
+ margin-left: 8px; /* Space between input and button */
+ transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+ background-color: #0056b3;
+ transform: scale(1.05);
+}
+.search-container {
+ transition: all 0.4s ease-in-out;
+ opacity: 0; /* Start invisible */
+ transform: translateY(-10px);
+}
+
+/* Show with animation when visible */
+.search-container.show {
+ display: flex !important;
+ opacity: 1;
+ transform: translateY(0);
+}
+/* Responsive Design */
+@media (max-width:768px) { 
+ .forecast-grid { grid-template-columns:repeat(4,1fr); }
+ body { padding:10px;flex-direction:column-reverse;}
+ .weather-card,.forecast-section{ max-width:none;margin-bottom:25px;width:auto;}
+}
+
+/* Loading State */
+.loading-state { text-align:center;padding:20px;color:#667eea;font-size:1.1rem;}

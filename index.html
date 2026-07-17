@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+ <title>Live Weather Dashboard</title>
+
+ <!-- Link to external CSS -->
+ <link rel="stylesheet" href="styles.css"/>
+
+ <!-- Link to external JavaScript -->
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<!-- Main Weather Card -->
+<div class="weather-card">
+ <div class="card-header">
+ <span id="city" style="font-size:1.4rem;color:#333;">New York, NY</span>
+ </div>
+
+ <!-- Location Search Input -->
+<div id="locationSearchContainer" class="search-container" style="display:none;background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:20px;">
+ <input type="text" id="cityInput" placeholder="Enter city name..." class="location-input">
+ <button onclick="searchCity()" class="search-btn">🔍</button>
+</div>
+
+ <!-- Weather Icon -->
+ <div style="text-align:center;"><span id="weatherIcon" class="weather-icon">☀️</span></div>
+
+ <h1 class="temperature"><span id="temp">Loading...</span>°F</h1>
+ <p class="condition" id="condition">Fetching weather data...</p>
+
+ <!-- Details Grid -->
+ <div class="details-grid">
+ <div class="detail-item">
+ <div class="detail-label">Humidity</div>
+ <div class="detail-value"><span id="humidity">--</span>%</div>
+ </div>
+ <div class="detail-item">
+ <div class="detail-label">Wind Speed</div>
+ <div class="detail-value"><span id="wind">--</span> mph</div>
+ </div>
+ <div class="detail-item">
+ <div class="detail-label">Feels Like</div>
+ <div class="detail-value"><span id="feelsLike">--</span>°F</div>
+ </div>
+ </div>
+
+ <!-- Refresh Button -->
+ <button onclick="loadWeather()" style="width:100%;margin-top:25px;" class="refresh-btn">🔄 Update Weather Data</button>
+</div>
+
+<!-- 7-Day Forecast Section -->
+<div class="forecast-section">
+ <h2 style="text-align:center;margin-bottom:15px;color:#333;">⏳ 7-Day Forecast</h2>
+ <div id="forecastContainer" class="forecast-grid"></div>
+ <button onclick="loadForecast()" style="width:100%;margin-top:20px;" class="refresh-btn">🔄 Update Forecast</button>
+</div>
+
+<!-- Link to external JavaScript -->
+<script src="script.js"></script>
+<!-- Optional: Change Location Button -->
+<button onclick="toggleLocationSearch()" style="margin-top:10px;width:100%;background:#4CAF50;color:white;border:none;padding:8px 12px;font-size:1rem;cursor:pointer;" class="refresh-btn">
+ 🔄 Change Location
+</button>
+
+</body>
+</html>
