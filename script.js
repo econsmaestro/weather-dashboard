@@ -11,58 +11,47 @@ const WEATHER_CODES = {
  1: { icon:'🌤️', desc:'Mainly Clear' },
  2: { icon:'⛅', desc:'Partly Cloudy' },
  3: { icon:'☁️', desc:'Overcast' },
- 45:{icon:'🌫️',desc:'Foggy'}, 
+ 45:{icon:'🌫️',desc:'Foggy'},
  48:{icon:'🌫️',desc:'Rime Fog'},
- 51:{icon:'💧',desc:'Light Drizzle'}, 
- 53:{icon:'💧',desc:'Moderate Drizzle'}, 
+ 51:{icon:'💧',desc:'Light Drizzle'},
+ 53:{icon:'💧',desc:'Moderate Drizzle'},
  55:{icon:'💦',desc:'Dense Drizzle'},
- 61:{icon:'☔',desc:'Slight Rain'}, 
- 63:{icon:'🌧️',desc:'Rain'}, 
+ 56:{icon:'🌧️',desc:'Light Freezing Drizzle'},
+ 57:{icon:'🌧️',desc:'Dense Freezing Drizzle'},
+ 61:{icon:'☔',desc:'Slight Rain'},
+ 63:{icon:'🌧️',desc:'Rain'},
  65:{icon:'⛈️',desc:'Heavy Rain'},
- 71:{icon:'❄️',desc:'Light Snow'}, 
- 73:{icon:'❄️',desc:'Moderate Snow'}, 
+ 66:{icon:'🌧️',desc:'Light Freezing Rain'},
+ 67:{icon:'🌧️',desc:'Heavy Freezing Rain'},
+ 71:{icon:'❄️',desc:'Light Snow'},
+ 73:{icon:'❄️',desc:'Moderate Snow'},
  75:{icon:'☃️',desc:'Heavy Snow'},
- 80:{icon:'🌦️',desc:'Slight Showers'}, 
- 81:{icon:'🌨️',desc:'Showers'}, 
+ 77:{icon:'❄️',desc:'Snow Grains'},
+ 80:{icon:'🌦️',desc:'Slight Showers'},
+ 81:{icon:'🌨️',desc:'Showers'},
  82:{icon:'⛈️',desc:'Violent Showers'},
- 95:{icon:'⚡',desc:'Thunderstorm'}, 
- 96:{icon:'❄️⚡',desc:'Hail & Thunderstorm'}
+ 85:{icon:'🌨️',desc:'Slight Snow Showers'},
+ 86:{icon:'🌨️',desc:'Heavy Snow Showers'},
+ 95:{icon:'⚡',desc:'Thunderstorm'},
+ 96:{icon:'❄️⚡',desc:'Thunderstorm with Slight Hail'},
+ 99:{icon:'❄️⚡',desc:'Thunderstorm with Heavy Hail'}
 };
 
-// Convert Celsius to Fahrenheit
-function celsiusToFahrenheit(tempC) { 
- return Math.round((tempC * 9/5) + 32); 
-}
+const UNKNOWN_WEATHER = { icon:'❓', desc:'Unknown' };
 
-// Get weather icon and description from code (FIXED)
+// Get weather icon and description from code
 function getWeatherInfo(code) {
- // Handle ranges:
- if ([45, 48].includes(code)) return WEATHER_CODES[45];
- if ([51,67].includes(code)) return code >= 60 ? WEATHER_CODES[63] : WEATHER_CODES[53];
-
- // Thunderstorms (95-99)
- const isThunderstorm = [95, 96, 98, 99].some(c => c === code);
- if (isThunderstorm) return WEATHER_CODES[95]; 
-
- // Default fallback
- const weatherInfo = Object.values(WEATHER_CODES).find(w => w.icon === '☀️' || true);
- if (!weatherInfo) {
- console.log('Weather code not found:', code); 
- return WEATHER_CODES[0];
- }
-
- return weatherInfo;
+ return WEATHER_CODES[code] || UNKNOWN_WEATHER;
 }
 
 // Toggle location search visibility
-function toggleLocationSearch() { 
+function toggleLocationSearch() {
  const container = document.getElementById('locationSearchContainer');
  if (!container) return;
 
- // If hidden, show it; otherwise hide.
- container.style.display = container.style.display === 'none' ? 'flex' : 'none';
- if (container.style.display !== 'none') {
- document.getElementById('cityInput').focus(); 
+ const isShown = container.classList.toggle('show');
+ if (isShown) {
+ document.getElementById('cityInput').focus();
  }
 }
 
@@ -83,7 +72,10 @@ async function searchCity() {
  document.getElementById('city').textContent = `${data.results[0].name}, ${data.results[0].country || ''}`.trim();
  toggleLocationSearch(); // Hide search container after successful lookup
 
- } else { 
+ loadWeather();
+ loadForecast();
+
+ } else {
  alert(`City "${cityName}" not found! Try another name.`);
  }
 
@@ -94,44 +86,60 @@ async function searchCity() {
 }
 
 // Load current weather data from Open-Meteo API
-async function loadWeather() { 
+async function loadWeather() {
  try {
- const params = new URLSearchParams({ latitude: currentLat, longitude: currentLng, current_weather:true });
+ const params = new URLSearchParams({
+ latitude: currentLat,
+ longitude: currentLng,
+ current: 'temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code',
+ temperature_unit: 'fahrenheit',
+ wind_speed_unit: 'mph'
+ });
 
  console.log(`Fetching weather for lat:${currentLat},lng:${currentLng}`); // Debug log
 
  const response = await fetch(`${WEATHER_API}?${params}`);
 
- if (!response.ok) { 
+ if (!response.ok) {
  throw new Error(`API request failed with status: ${response.status}`);
  }
 
  const data = await response.json();
- console.log('Weather API Response:',data.current_weather); // Debug log
+ console.log('Weather API Response:',data.current); // Debug log
 
- if (data && data.current_weather) {
- document.getElementById('temp').textContent = celsiusToFahrenheit(data.current_weather.temperature);
+ if (data && data.current) {
+ const weatherInfo = getWeatherInfo(data.current.weather_code);
 
- const weatherInfo = getWeatherInfo(data.current_weather.weather_code);
+ document.getElementById('temp').textContent = Math.round(data.current.temperature_2m);
  document.getElementById('weatherIcon').textContent = weatherInfo.icon;
+ document.getElementById('condition').textContent = weatherInfo.desc;
+ document.getElementById('humidity').textContent = Math.round(data.current.relative_humidity_2m);
+ document.getElementById('wind').textContent = Math.round(data.current.wind_speed_10m);
+ document.getElementById('feelsLike').textContent = Math.round(data.current.apparent_temperature);
 
  } else { throw new Error('Invalid API response structure');}
 
- } catch (error) { 
- console.error('Weather API error:',error); 
+ } catch (error) {
+ console.error('Weather API error:',error);
  alert(`Error fetching weather: ${error.message}`);
  }
 }
 
 // Load forecast data from Open-Meteo API
-async function loadForecast() { 
+async function loadForecast() {
  try {
- const params = new URLSearchParams({ latitude: currentLat, longitude: currentLng, daily_weather_code:true,daily_temperature_2m_max:'true',daily_temperature_2m_min:'true' });
+ const params = new URLSearchParams({
+ latitude: currentLat,
+ longitude: currentLng,
+ daily: 'weather_code,temperature_2m_max,temperature_2m_min',
+ forecast_days: '7',
+ temperature_unit: 'fahrenheit'
+ });
  console.log(`Fetching forecast for lat:${currentLat},lng:${currentLng}`);
 
  // Fetch data
  const response = await fetch(`${WEATHER_API}?${params}`);
- if (!response.ok) { 
+ if (!response.ok) {
  throw new Error(`Forecast API request failed with status: ${response.status}`); }
 
  const data = await response.json();
@@ -148,23 +156,20 @@ async function loadForecast() {
  const container = document.getElementById('forecastContainer');
  container.innerHTML = ''; // Clear previous cards
 
- for (let i=0; i < Math.min(7, data.daily.time.length); i++) { 
+ for (let i=0; i < Math.min(7, data.daily.time.length); i++) {
  if (!data.daily.time[i]) continue;
 
  try {
  const dateObj = new Date(data.daily.time[i]);
  const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
 
- // Safely get max/min temps
- const highTempC = data.daily.temperature_2m_max?.[i] || 0;
- const lowTempC = data.daily.temperature_2m_min?.[i] || 0;
-
- const highTempF = celsiusToFahrenheit(highTempC);
- const lowTempF = celsiusToFahrenheit(lowTempC);
+ // Safely get max/min temps (already in Fahrenheit via temperature_unit param)
+ const highTempF = data.daily.temperature_2m_max?.[i] ?? 0;
+ const lowTempF = data.daily.temperature_2m_min?.[i] ?? 0;
 
  // Get weather code and icon
- const weatherCode = data.daily.weather_code?.[i] || 0;
- const forecastInfo = getWeatherInfo(weatherCode); 
+ const weatherCode = data.daily.weather_code?.[i] ?? 0;
+ const forecastInfo = getWeatherInfo(weatherCode);
 
  container.innerHTML += `
  <div class="forecast-card">
@@ -177,13 +182,13 @@ async function loadForecast() {
  }
  }
 
- } catch (error) { 
- console.error('Forecast API error:', error); 
+ } catch (error) {
+ console.error('Forecast API error:', error);
  alert(`Error fetching forecast: ${error.message}`); }
 }
 
 // Initial load on page open:
-loadWeather(); 
+loadWeather();
 setTimeout(loadForecast, 1000); // Small delay to ensure weather loads first
 
 // Add Enter key support for search input:
