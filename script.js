@@ -4,6 +4,7 @@ const GEOCODING_API = 'https://geocoding-api.open-meteo.com/v1/search';
 
 let currentLat = 40.7128; // Default: New York City coordinates
 let currentLng = -74.0060;
+let currentUnit = 'fahrenheit'; // 'fahrenheit' or 'celsius'
 
 // Complete Open-Meteo Weather Code Mapping to Icons & Descriptions
 const WEATHER_CODES = {
@@ -42,6 +43,18 @@ const UNKNOWN_WEATHER = { icon:'❓', desc:'Unknown' };
 // Get weather icon and description from code
 function getWeatherInfo(code) {
  return WEATHER_CODES[code] || UNKNOWN_WEATHER;
+}
+
+// Switch between Fahrenheit/mph and Celsius/km/h
+function setUnit(unit) {
+ if (unit === currentUnit) return;
+ currentUnit = unit;
+
+ document.getElementById('unitF').classList.toggle('active', unit === 'fahrenheit');
+ document.getElementById('unitC').classList.toggle('active', unit === 'celsius');
+
+ loadWeather();
+ loadForecast();
 }
 
 // Toggle location search visibility
@@ -92,8 +105,8 @@ async function loadWeather() {
  latitude: currentLat,
  longitude: currentLng,
  current: 'temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code',
- temperature_unit: 'fahrenheit',
- wind_speed_unit: 'mph'
+ temperature_unit: currentUnit,
+ wind_speed_unit: currentUnit === 'fahrenheit' ? 'mph' : 'kmh'
  });
 
  console.log(`Fetching weather for lat:${currentLat},lng:${currentLng}`); // Debug log
@@ -110,12 +123,18 @@ async function loadWeather() {
  if (data && data.current) {
  const weatherInfo = getWeatherInfo(data.current.weather_code);
 
+ const unitLabel = currentUnit === 'fahrenheit' ? 'F' : 'C';
+ const windLabel = currentUnit === 'fahrenheit' ? 'mph' : 'km/h';
+
  document.getElementById('temp').textContent = Math.round(data.current.temperature_2m);
+ document.getElementById('tempUnit').textContent = unitLabel;
  document.getElementById('weatherIcon').textContent = weatherInfo.icon;
  document.getElementById('condition').textContent = weatherInfo.desc;
  document.getElementById('humidity').textContent = Math.round(data.current.relative_humidity_2m);
  document.getElementById('wind').textContent = Math.round(data.current.wind_speed_10m);
+ document.getElementById('windUnit').textContent = windLabel;
  document.getElementById('feelsLike').textContent = Math.round(data.current.apparent_temperature);
+ document.getElementById('feelsLikeUnit').textContent = unitLabel;
 
  } else { throw new Error('Invalid API response structure');}
 
@@ -133,7 +152,7 @@ async function loadForecast() {
  longitude: currentLng,
  daily: 'weather_code,temperature_2m_max,temperature_2m_min',
  forecast_days: '7',
- temperature_unit: 'fahrenheit'
+ temperature_unit: currentUnit
  });
  console.log(`Fetching forecast for lat:${currentLat},lng:${currentLng}`);
 
@@ -163,9 +182,9 @@ async function loadForecast() {
  const dateObj = new Date(data.daily.time[i]);
  const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
 
- // Safely get max/min temps (already in Fahrenheit via temperature_unit param)
- const highTempF = data.daily.temperature_2m_max?.[i] ?? 0;
- const lowTempF = data.daily.temperature_2m_min?.[i] ?? 0;
+ // Safely get max/min temps (already in the selected unit via temperature_unit param)
+ const highTemp = data.daily.temperature_2m_max?.[i] ?? 0;
+ const lowTemp = data.daily.temperature_2m_min?.[i] ?? 0;
 
  // Get weather code and icon
  const weatherCode = data.daily.weather_code?.[i] ?? 0;
@@ -175,7 +194,7 @@ async function loadForecast() {
  <div class="forecast-card">
  <div class="day-name">${dayName}</div>
  <span class="forecast-icon" id="weatherIcon-${i}">${forecastInfo.icon}</span>
- <div class="high-low"><span>${Math.round(highTempF)}°</span>/<span style="color:#888;">${Math.round(lowTempF)}°</span></div>
+ <div class="high-low"><span>${Math.round(highTemp)}°</span>/<span style="color:#888;">${Math.round(lowTemp)}°</span></div>
  </div>`;
  } catch (e) {
  console.error("Error processing forecast item:", e);

@@ -15,6 +15,10 @@
 <div class="weather-card">
  <div class="card-header">
  <span id="city" style="font-size:1.4rem;color:#333;">New York, NY</span>
+ <div class="unit-toggle">
+ <button id="unitF" class="unit-btn active" onclick="setUnit('fahrenheit')">°F</button>
+ <button id="unitC" class="unit-btn" onclick="setUnit('celsius')">°C</button>
+ </div>
  </div>
 
  <!-- Location Search Input -->
@@ -26,7 +30,7 @@
  <!-- Weather Icon -->
  <div style="text-align:center;"><span id="weatherIcon" class="weather-icon">☀️</span></div>
 
- <h1 class="temperature"><span id="temp">Loading...</span>°F</h1>
+ <h1 class="temperature"><span id="temp">Loading...</span>°<span id="tempUnit">F</span></h1>
  <p class="condition" id="condition">Fetching weather data...</p>
 
  <!-- Details Grid -->
@@ -37,11 +41,11 @@
  </div>
  <div class="detail-item">
  <div class="detail-label">Wind Speed</div>
- <div class="detail-value"><span id="wind">--</span> mph</div>
+ <div class="detail-value"><span id="wind">--</span> <span id="windUnit">mph</span></div>
  </div>
  <div class="detail-item">
  <div class="detail-label">Feels Like</div>
- <div class="detail-value"><span id="feelsLike">--</span>°F</div>
+ <div class="detail-value"><span id="feelsLike">--</span>°<span id="feelsLikeUnit">F</span></div>
  </div>
  </div>
 

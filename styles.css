@@ -20,7 +20,12 @@ body {
  padding:30px;margin-top:-65px;position:relative;z-index:1;width:480px;}
 
 /* Card Header */
-.card-header { display:flex;justify-content:center;align-items:center;margin-bottom:25px;}
+.card-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;}
+
+/* Unit Toggle */
+.unit-toggle { display:flex;border-radius:8px;overflow:hidden;border:1px solid #ddd;}
+.unit-btn { background:#f8f9fa;color:#888;border:none;padding:4px 10px;font-size:0.85rem;cursor:pointer;}
+.unit-btn.active { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;}
 
 /* Search Container */
 .search-container { 
