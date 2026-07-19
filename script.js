@@ -40,6 +40,21 @@ const WEATHER_CODES = {
 
 const UNKNOWN_WEATHER = { icon:'❓', desc:'Unknown' };
 
+// Fetch with a couple of retries so a transient network blip (e.g. right
+// after a page reload) doesn't surface as an error to the user.
+async function fetchWithRetry(url, retries = 2, delayMs = 700) {
+ for (let attempt = 0; attempt <= retries; attempt++) {
+ try {
+ const response = await fetch(url);
+ if (!response.ok) throw new Error(`API request failed with status: ${response.status}`);
+ return response;
+ } catch (error) {
+ if (attempt === retries) throw error;
+ await new Promise(resolve => setTimeout(resolve, delayMs));
+ }
+ }
+}
+
 // Get weather icon and description from code
 function getWeatherInfo(code) {
  return WEATHER_CODES[code] || UNKNOWN_WEATHER;
@@ -75,7 +90,7 @@ async function searchCity() {
  if (!cityName) return;
 
  try {
- const response = await fetch(`${GEOCODING_API}?name=${encodeURIComponent(cityName)}&count=1`);
+ const response = await fetchWithRetry(`${GEOCODING_API}?name=${encodeURIComponent(cityName)}&count=1`);
  const data = await response.json();
 
  if (data.results && data.results.length > 0) {
@@ -112,11 +127,7 @@ async function loadWeather() {
 
  console.log(`Fetching weather for lat:${currentLat},lng:${currentLng}`); // Debug log
 
- const response = await fetch(`${WEATHER_API}?${params}`);
-
- if (!response.ok) {
- throw new Error(`API request failed with status: ${response.status}`);
- }
+ const response = await fetchWithRetry(`${WEATHER_API}?${params}`);
 
  const data = await response.json();
  console.log('Weather API Response:',data.current); // Debug log
@@ -165,9 +176,7 @@ async function loadForecast() {
  console.log(`Fetching forecast for lat:${currentLat},lng:${currentLng}`);
 
  // Fetch data
- const response = await fetch(`${WEATHER_API}?${params}`);
- if (!response.ok) {
- throw new Error(`Forecast API request failed with status: ${response.status}`); }
+ const response = await fetchWithRetry(`${WEATHER_API}?${params}`);
 
  const data = await response.json();
 
